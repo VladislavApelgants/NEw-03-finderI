@@ -11,33 +11,35 @@ export class App extends Component {
   state = {
     queryValue: '',
     dataImage: [],
-    page: 1
+    page: 1,
+    status: false
   }
 
   async componentDidUpdate(nextProps, nextState) {
-    const { queryValue, page } = this.state
+   
+    const { queryValue, page, status } = this.state
     
     try {
-      if (queryValue !== nextState.queryValue) {
-        this.setState({page: 1})
-      }
-      
-      if (queryValue !== nextState.queryValue || page !== nextState.page) {
+      if (status) {
         const response = await fetchImage(queryValue, page)
-
-        this.setState((prevState) => ({dataImage: [...prevState.dataImage, ...response.hits]}))
-    }
+        this.setState(prevState => {
+          return {
+            dataImage: [...prevState.dataImage, ...response.hits],
+            status: false
+          }
+        })
+      }
     } catch (error) {
       console.log(error);
     }
   }
 
   onSubmitForm = ({search}) => {
-    this.setState({queryValue: search})
+    this.setState({queryValue: search, status: true, page:1, dataImage: []})
   }
 
   onLoadMore = () => {
-  this.setState(prevState => ({page: prevState.page + 1}))
+  this.setState(prevState => ({page: prevState.page + 1, status: true}))
   }
   
   render() {
